@@ -15,25 +15,32 @@ ids = (34373370, 26257166, 12579252)
 def profile(idlist):
     for id in idlist:
 	    print api.get_user(user_id=id)
-
 profile(ids)
+
+def profile2(idlist):
+    for id in idlist:
+        p=api.get_user(user_id=id)
+        print p.screen_name
+        print p.id
+profile2(ids)
 
 # Collect the first 20 followers of a specified user.
 def followers(idlist):
     for id in idlist:
-	    print 'follower: ' + api.followers(user_id=id).screen_name.items(20) 
-		# for follower in tweepy.Cursor(api.followers, user_id=id).items(20):
-		    # print 'follower: ' + follower.screen_name
-
+        i = 1
+        for follower in tweepy.Cursor(api.followers, user_id=id).items(20):
+            print 'follower no.' + str(i) + ' of ' + str(id) + ': ' + follower.screen_name
+            i += 1
 followers(ids)
 
 # Collect the first 20 friends of a specified user.
 def friends(idlist):
     for id in idlist:
-	    print 'friend: ' + api.friends_ids(user_id=id).screen_name.items(20)
-		# for friend in tweepy.Cursor(api.friends_ids, user_id=id).items(20):
-		    # print 'friend: ' + friend.screen_name
-		
+        i = 1
+        for friendid in tweepy.Cursor(api.friends_ids, user_id=id).items(20):
+            p = api.get_user(user_id=friendid)
+            print 'friend no.' + str(i) + ' of ' + str(id) + ': ' + p.screen_name + ' ' + str(p.id)
+            i += 1
 friends(ids)
 
 # Assign key words to the keyword_list
@@ -43,10 +50,13 @@ kws = ('Indiana', 'weather')
 def tweets_with_kw(kwlist):
     for kw in kwlist:
         for tweet in tweepy.Cursor(api.search, q=kw).items(50):
-	        print "tweet with keyword '" + kw + "' : " + tweet.text
-
+            try:
+	            print "tweet with keyword '" + kw + "' : " + tweet.text.encode('utf-8')
+            except tweepy.TweepError as e:
+	            print(e.reason)
 tweets_with_kw(kws)
 
+####################################################################
 # Assign coordinates to the variable
 box = [-86.33,41.63,-86.20,41.74]
 
