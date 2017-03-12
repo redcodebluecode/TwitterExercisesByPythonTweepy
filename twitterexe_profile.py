@@ -57,17 +57,47 @@ def tweets_with_kw(kwlist):
 tweets_with_kw(kws)
 
 ####################################################################
+# In Construction
+# Collect 50 tweets that originate from a specified geographic region
+
+# Import Tweepy, sys, sleep, credentials.py
+try:
+    import json
+except ImportError:
+    import simplejson as json
+import tweepy, sys
+from time import sleep
+from credentials import *
+
+# Access and authorize our Twitter credentials from credentials.py
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+api = tweepy.API(auth)
+
 # Assign coordinates to the variable
-box = [-86.33,41.63,-86.20,41.74]
+box = [-74.0,40.73,-73.0,41.73]
 
-# Stream Data Function
-class CustomStreamListener(tweepy.StreamListener):
+#override tweepy.StreamListener to add logic to on_status
+class MyStreamListener(tweepy.StreamListener):
+    def __init__(self, api=None):
+        super(MyStreamListener, self).__init__()
+        self.counter = 0
+        
+    def on_status(self, status):
+        record = {'Text': status.text, 'Coordinates': status.coordinates, 'Created At': status.created_at}
+        self.counter += 1
+        if self.counter < 50:
+            print record
+            return True
+        else:
+            return False
+            
     def on_error(self, status_code):
-        print >> sys.stderr, 'Encountered error with status code:', status_code
-        return True # Don't kill the stream
-    def on_timeout(self):
-        print >> sys.stderr, 'Timeout...'
-        return True # Don't kill the stream
+        if status_code == 420:
+            #returning False in on_data disconnects the stream
+            return False
 
-stream = tweepy.streaming.Stream(auth, CustomStreamListener()).filter(locations=box).items(50)
-stream
+myStreamListener = MyStreamListener()
+myStream = tweepy.Stream(api.auth, listener=myStreamListener)
+myStream.filter(locations=box, async=True)
+print myStream
