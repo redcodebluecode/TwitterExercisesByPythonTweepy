@@ -9,6 +9,3 @@ It provides the following function:
 - Collect the first 20 friends of a list of specified users.
 - Collect 50 tweets that contain a specified keyword.
 - Collect 50 tweets in a specified geographic area.
-
-In construction
-- Collect 50 tweets in a specified geographic area.
