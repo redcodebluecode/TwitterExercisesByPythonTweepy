@@ -98,3 +98,15 @@ myStreamListener = MyStreamListener()
 myStream = tweepy.Stream(api.auth, listener=myStreamListener)
 myStream.filter(locations=box, async=True)
 
+# According to this source: https://dev.twitter.com/streaming/overview/request-parameters#locations
+# Only geolocated Tweets falling within the requested bounding boxes will be included.
+# This implies that the coordinates field can be None but that the bbox filter is guaranteed 
+# to return tweets from the bounding box region.
+
+# How does the bounding box filter work?
+# The streaming API uses the following heuristic to determine whether a given Tweet falls within a bounding box:
+# - If the coordinates field is populated, the values there will be tested against the bounding box. 
+# Note that this field uses geoJSON order (longitude, latitude).
+# - If coordinates is empty but place is populated,the region defined in place is checked for intersection 
+# against the locations bounding box. Any overlap will match. 
+# - If none of the rules listed above match, the Tweet does not match the location query.
