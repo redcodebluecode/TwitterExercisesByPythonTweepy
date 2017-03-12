@@ -56,10 +56,7 @@ def tweets_with_kw(kwlist):
 	            print(e.reason)
 tweets_with_kw(kws)
 
-####################################################################
-# In Construction
 # Collect 50 tweets that originate from a specified geographic region
-
 # Import Tweepy, sys, sleep, credentials.py
 try:
     import json
@@ -84,9 +81,9 @@ class MyStreamListener(tweepy.StreamListener):
         self.counter = 0
         
     def on_status(self, status):
-        record = {'Text': status.text, 'Coordinates': status.coordinates, 'Created At': status.created_at}
+        record = {'Text': status.text, 'Coordinates': status.coordinates, 'Place': status.place, 'Created At': status.created_at}
         self.counter += 1
-        if self.counter < 50:
+        if self.counter <= 50:
             print record
             return True
         else:
@@ -100,4 +97,4 @@ class MyStreamListener(tweepy.StreamListener):
 myStreamListener = MyStreamListener()
 myStream = tweepy.Stream(api.auth, listener=myStreamListener)
 myStream.filter(locations=box, async=True)
-print myStream
+
